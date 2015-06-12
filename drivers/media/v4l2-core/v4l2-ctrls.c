@@ -2888,6 +2888,13 @@ int v4l2_subdev_g_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *cs
 }
 EXPORT_SYMBOL(v4l2_subdev_g_ext_ctrls);
 
+int v4l2_subdev_g_def_ext_ctrls(struct v4l2_subdev *sd,
+				struct v4l2_ext_controls *cs)
+{
+	return v4l2_g_ext_ctrls(sd->ctrl_handler, cs, true);
+}
+EXPORT_SYMBOL(v4l2_subdev_g_def_ext_ctrls);
+
 /* Helper function to get a single control */
 static int get_ctrl(struct v4l2_ctrl *ctrl, struct v4l2_ext_control *c)
 {
