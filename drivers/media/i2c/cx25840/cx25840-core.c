@@ -5044,6 +5044,7 @@ static const struct v4l2_subdev_core_ops cx25840_core_ops = {
 	.s_ext_ctrls = v4l2_subdev_s_ext_ctrls,
 	.try_ext_ctrls = v4l2_subdev_try_ext_ctrls,
 	.g_ext_ctrls = v4l2_subdev_g_ext_ctrls,
+	.g_def_ext_ctrls = v4l2_subdev_g_def_ext_ctrls,
 	.queryctrl = v4l2_subdev_queryctrl,
 	.querymenu = v4l2_subdev_querymenu,
 	.reset = cx25840_reset,
