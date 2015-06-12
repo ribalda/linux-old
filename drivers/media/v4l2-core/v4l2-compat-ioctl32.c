@@ -817,6 +817,7 @@ static int put_v4l2_edid32(struct v4l2_edid *kp, struct v4l2_edid32 __user *up)
 #define	VIDIOC_DQEVENT32	_IOR ('V', 89, struct v4l2_event32)
 #define VIDIOC_CREATE_BUFS32	_IOWR('V', 92, struct v4l2_create_buffers32)
 #define VIDIOC_PREPARE_BUF32	_IOWR('V', 93, struct v4l2_buffer32)
+#define VIDIOC_G_DEF_EXT_CTRLS32 _IOWR('V', 104, struct v4l2_ext_controls32)
 
 #define VIDIOC_OVERLAY32	_IOW ('V', 14, s32)
 #define VIDIOC_STREAMON32	_IOW ('V', 18, s32)
@@ -858,6 +859,7 @@ static long do_video_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 	case VIDIOC_ENUMINPUT32: cmd = VIDIOC_ENUMINPUT; break;
 	case VIDIOC_TRY_FMT32: cmd = VIDIOC_TRY_FMT; break;
 	case VIDIOC_G_EXT_CTRLS32: cmd = VIDIOC_G_EXT_CTRLS; break;
+	case VIDIOC_G_DEF_EXT_CTRLS32: cmd = VIDIOC_G_DEF_EXT_CTRLS; break;
 	case VIDIOC_S_EXT_CTRLS32: cmd = VIDIOC_S_EXT_CTRLS; break;
 	case VIDIOC_TRY_EXT_CTRLS32: cmd = VIDIOC_TRY_EXT_CTRLS; break;
 	case VIDIOC_DQEVENT32: cmd = VIDIOC_DQEVENT; break;
@@ -935,6 +937,7 @@ static long do_video_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 		break;
 
 	case VIDIOC_G_EXT_CTRLS:
+	case VIDIOC_G_DEF_EXT_CTRLS:
 	case VIDIOC_S_EXT_CTRLS:
 	case VIDIOC_TRY_EXT_CTRLS:
 		err = get_v4l2_ext_controls32(&karg.v2ecs, up);
@@ -962,6 +965,7 @@ static long do_video_ioctl(struct file *file, unsigned int cmd, unsigned long ar
 	   contain information on which control failed. */
 	switch (cmd) {
 	case VIDIOC_G_EXT_CTRLS:
+	case VIDIOC_G_DEF_EXT_CTRLS:
 	case VIDIOC_S_EXT_CTRLS:
 	case VIDIOC_TRY_EXT_CTRLS:
 		if (put_v4l2_ext_controls32(&karg.v2ecs, up))

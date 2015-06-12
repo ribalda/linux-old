@@ -205,6 +205,9 @@ static long subdev_do_ioctl(struct file *file, unsigned int cmd, void *arg)
 	case VIDIOC_G_EXT_CTRLS:
 		return v4l2_g_ext_ctrls(vfh->ctrl_handler, arg, false);
 
+	case VIDIOC_G_DEF_EXT_CTRLS:
+		return v4l2_g_ext_ctrls(vfh->ctrl_handler, arg, true);
+
 	case VIDIOC_S_EXT_CTRLS:
 		return v4l2_s_ext_ctrls(vfh, vfh->ctrl_handler, arg);
 

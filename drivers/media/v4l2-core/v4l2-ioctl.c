@@ -1991,6 +1991,25 @@ static int v4l_g_ext_ctrls(const struct v4l2_ioctl_ops *ops,
 					-EINVAL;
 }
 
+static int v4l_g_def_ext_ctrls(const struct v4l2_ioctl_ops *ops,
+				struct file *file, void *fh, void *arg)
+{
+	struct video_device *vfd = video_devdata(file);
+	struct v4l2_ext_controls *p = arg;
+	struct v4l2_fh *vfh =
+		test_bit(V4L2_FL_USES_V4L2_FH, &vfd->flags) ? fh : NULL;
+
+	p->error_idx = p->count;
+	if (vfh && vfh->ctrl_handler)
+		return v4l2_g_ext_ctrls(vfh->ctrl_handler, p, true);
+	if (vfd->ctrl_handler)
+		return v4l2_g_ext_ctrls(vfd->ctrl_handler, p, true);
+	if (ops->vidioc_g_def_ext_ctrls == NULL)
+		return -ENOTTY;
+	return check_ext_ctrls(p, 0) ?
+		ops->vidioc_g_def_ext_ctrls(file, fh, p) : -EINVAL;
+}
+
 static int v4l_s_ext_ctrls(const struct v4l2_ioctl_ops *ops,
 				struct file *file, void *fh, void *arg)
 {
@@ -2435,6 +2454,7 @@ static struct v4l2_ioctl_info v4l2_ioctls[] = {
 	IOCTL_INFO_FNC(VIDIOC_G_SLICED_VBI_CAP, v4l_g_sliced_vbi_cap, v4l_print_sliced_vbi_cap, INFO_FL_CLEAR(v4l2_sliced_vbi_cap, type)),
 	IOCTL_INFO_FNC(VIDIOC_LOG_STATUS, v4l_log_status, v4l_print_newline, 0),
 	IOCTL_INFO_FNC(VIDIOC_G_EXT_CTRLS, v4l_g_ext_ctrls, v4l_print_ext_controls, INFO_FL_CTRL),
+	IOCTL_INFO_FNC(VIDIOC_G_DEF_EXT_CTRLS, v4l_g_def_ext_ctrls, v4l_print_ext_controls, INFO_FL_CTRL),
 	IOCTL_INFO_FNC(VIDIOC_S_EXT_CTRLS, v4l_s_ext_ctrls, v4l_print_ext_controls, INFO_FL_PRIO | INFO_FL_CTRL),
 	IOCTL_INFO_FNC(VIDIOC_TRY_EXT_CTRLS, v4l_try_ext_ctrls, v4l_print_ext_controls, INFO_FL_CTRL),
 	IOCTL_INFO_STD(VIDIOC_ENUM_FRAMESIZES, vidioc_enum_framesizes, v4l_print_frmsizeenum, INFO_FL_CLEAR(v4l2_frmsizeenum, pixel_format)),
@@ -2643,6 +2663,7 @@ static int check_array_args(unsigned int cmd, void *parg, size_t *array_size,
 
 	case VIDIOC_S_EXT_CTRLS:
 	case VIDIOC_G_EXT_CTRLS:
+	case VIDIOC_G_DEF_EXT_CTRLS:
 	case VIDIOC_TRY_EXT_CTRLS: {
 		struct v4l2_ext_controls *ctrls = parg;
 
