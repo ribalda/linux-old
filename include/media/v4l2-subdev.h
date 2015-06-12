@@ -158,6 +158,8 @@ struct v4l2_subdev_core_ops {
 	int (*g_ctrl)(struct v4l2_subdev *sd, struct v4l2_control *ctrl);
 	int (*s_ctrl)(struct v4l2_subdev *sd, struct v4l2_control *ctrl);
 	int (*g_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
+	int (*g_def_ext_ctrls)(struct v4l2_subdev *sd,
+			       struct v4l2_ext_controls *ctrls);
 	int (*s_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
 	int (*try_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
 	int (*querymenu)(struct v4l2_subdev *sd, struct v4l2_querymenu *qm);
