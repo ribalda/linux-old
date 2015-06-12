@@ -1001,6 +1001,35 @@ static int uvc_ioctl_g_ext_ctrls(struct file *file, void *fh,
 	return uvc_ctrl_rollback(handle);
 }
 
+static int uvc_ioctl_g_def_ext_ctrls(struct file *file, void *fh,
+				     struct v4l2_ext_controls *ctrls)
+{
+	struct uvc_fh *handle = fh;
+	struct uvc_video_chain *chain = handle->chain;
+	struct v4l2_ext_control *ctrl = ctrls->controls;
+	unsigned int i;
+	int ret;
+	struct v4l2_queryctrl qc;
+
+	ret = uvc_ctrl_begin(chain);
+	if (ret < 0)
+		return ret;
+
+	for (i = 0; i < ctrls->count; ++ctrl, ++i) {
+		qc.id = ctrl->id;
+		ret = uvc_query_v4l2_ctrl(chain, &qc);
+		if (ret < 0) {
+			ctrls->error_idx = i;
+			return ret;
+		}
+		ctrl->value = qc.default_value;
+	}
+
+	ctrls->error_idx = 0;
+
+	return 0;
+}
+
 static int uvc_ioctl_s_try_ext_ctrls(struct uvc_fh *handle,
 				     struct v4l2_ext_controls *ctrls,
 				     bool commit)
@@ -1500,6 +1529,7 @@ const struct v4l2_ioctl_ops uvc_ioctl_ops = {
 	.vidioc_g_ctrl = uvc_ioctl_g_ctrl,
 	.vidioc_s_ctrl = uvc_ioctl_s_ctrl,
 	.vidioc_g_ext_ctrls = uvc_ioctl_g_ext_ctrls,
+	.vidioc_g_def_ext_ctrls = uvc_ioctl_g_def_ext_ctrls,
 	.vidioc_s_ext_ctrls = uvc_ioctl_s_ext_ctrls,
 	.vidioc_try_ext_ctrls = uvc_ioctl_try_ext_ctrls,
 	.vidioc_querymenu = uvc_ioctl_querymenu,
