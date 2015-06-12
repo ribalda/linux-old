@@ -810,6 +810,33 @@ static int vidioc_queryctrl(struct file *file, void *priv,
 	return -EINVAL;
 }
 
+static int vidioc_g_def_ext_ctrls(struct file *file, void *priv,
+	struct v4l2_ext_controls *ctrls)
+{
+	struct saa7164_vbi_fh *fh = file->private_data;
+	struct saa7164_port *port = fh->port;
+	int i, err = 0;
+	struct v4l2_queryctrl q;
+
+	if (ctrls->ctrl_class == V4L2_CTRL_CLASS_MPEG) {
+		for (i = 0; i < ctrls->count; i++) {
+			struct v4l2_ext_control *ctrl = ctrls->controls + i;
+
+			q.id = ctrl->id;
+			err = fill_queryctrl(&port->vbi_params, &q);
+			if (err) {
+				ctrls->error_idx = i;
+				break;
+			}
+			ctrl->value = q.default_value;
+		}
+		return err;
+
+	}
+
+	return -EINVAL;
+}
+
 static int saa7164_vbi_stop_port(struct saa7164_port *port)
 {
 	struct saa7164_dev *dev = port->dev;
@@ -1263,6 +1290,7 @@ static const struct v4l2_ioctl_ops vbi_ioctl_ops = {
 	.vidioc_try_fmt_vid_cap	 = vidioc_try_fmt_vid_cap,
 	.vidioc_s_fmt_vid_cap	 = vidioc_s_fmt_vid_cap,
 	.vidioc_g_ext_ctrls	 = vidioc_g_ext_ctrls,
+	.vidioc_g_def_ext_ctrls	 = vidioc_g_def_ext_ctrls,
 	.vidioc_s_ext_ctrls	 = vidioc_s_ext_ctrls,
 	.vidioc_try_ext_ctrls	 = vidioc_try_ext_ctrls,
 	.vidioc_queryctrl	 = vidioc_queryctrl,
