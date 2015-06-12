@@ -649,6 +649,33 @@ static int pvr2_g_ext_ctrls(struct file *file, void *priv,
 	return 0;
 }
 
+static int pvr2_g_def_ext_ctrls(struct file *file, void *priv,
+					struct v4l2_ext_controls *ctls)
+{
+	struct pvr2_v4l2_fh *fh = file->private_data;
+	struct pvr2_hdw *hdw = fh->channel.mc_head->hdw;
+	struct v4l2_ext_control *ctrl;
+	unsigned int idx;
+	int ret;
+	struct pvr2_ctrl *cptr;
+
+	ret = 0;
+	for (idx = 0; idx < ctls->count; idx++) {
+		ctrl = ctls->controls + idx;
+		cptr = pvr2_hdw_get_ctrl_v4l(hdw, ctrl->id);
+		if (!ctrl){
+			ctls->error_idx = idx;
+			return -EINVAL;
+		}
+
+		/* Ensure that if read as a 64 bit value, the user
+		   will still get a hopefully sane value */
+		ctrl->value64 = 0;
+		pvr2_ctrl_get_def(cptr, &ctrl->value);
+	}
+	return 0;
+}
+
 static int pvr2_s_ext_ctrls(struct file *file, void *priv,
 		struct v4l2_ext_controls *ctls)
 {
@@ -809,6 +836,7 @@ static const struct v4l2_ioctl_ops pvr2_ioctl_ops = {
 	.vidioc_g_ctrl			    = pvr2_g_ctrl,
 	.vidioc_s_ctrl			    = pvr2_s_ctrl,
 	.vidioc_g_ext_ctrls		    = pvr2_g_ext_ctrls,
+	.vidioc_g_def_ext_ctrls		    = pvr2_g_def_ext_ctrls,
 	.vidioc_s_ext_ctrls		    = pvr2_s_ext_ctrls,
 	.vidioc_try_ext_ctrls		    = pvr2_try_ext_ctrls,
 };
