@@ -1,12 +1,13 @@
 <refentry id="vidioc-g-ext-ctrls">
   <refmeta>
     <refentrytitle>ioctl VIDIOC_G_EXT_CTRLS, VIDIOC_S_EXT_CTRLS,
-VIDIOC_TRY_EXT_CTRLS</refentrytitle>
+VIDIOC_TRY_EXT_CTRLS, VIDIOC_G_DEF_EXT_CTRLS</refentrytitle>
     &manvol;
   </refmeta>
 
   <refnamediv>
     <refname>VIDIOC_G_EXT_CTRLS</refname>
+    <refname>VIDIOC_G_DEF_EXT_CTRLS</refname>
     <refname>VIDIOC_S_EXT_CTRLS</refname>
     <refname>VIDIOC_TRY_EXT_CTRLS</refname>
     <refpurpose>Get or set the value of several controls, try control
@@ -39,7 +40,7 @@ values</refpurpose>
 	<term><parameter>request</parameter></term>
 	<listitem>
 	  <para>VIDIOC_G_EXT_CTRLS, VIDIOC_S_EXT_CTRLS,
-VIDIOC_TRY_EXT_CTRLS</para>
+VIDIOC_TRY_EXT_CTRLS, VIDIOC_G_DEF_EXT_CTRLS</para>
 	</listitem>
       </varlistentry>
       <varlistentry>
@@ -74,7 +75,10 @@ of each &v4l2-ext-control; and call the
 <constant>VIDIOC_G_EXT_CTRLS</constant> ioctl. String controls controls
 must also set the <structfield>string</structfield> field. Controls
 of compound types (<constant>V4L2_CTRL_FLAG_HAS_PAYLOAD</constant> is set)
-must set the <structfield>ptr</structfield> field.</para>
+must set the <structfield>ptr</structfield> field. To get the default value
+instead of the current value, call the
+<constant>VIDIOC_G_DEF_EXT_CTRLS</constant> ioctl with the same arguments.
+</para>
 
     <para>If the <structfield>size</structfield> is too small to
 receive the control result (only relevant for pointer-type controls
@@ -141,7 +145,8 @@ application.</entry>
 	    <entry>The total size in bytes of the payload of this
 control. This is normally 0, but for pointer controls this should be
 set to the size of the memory containing the payload, or that will
-receive the payload. If <constant>VIDIOC_G_EXT_CTRLS</constant> finds
+receive the payload. If <constant>VIDIOC_G_EXT_CTRLS</constant>
+or <constant>VIDIOC_G_DEF_EXT_CTRLS</constant> finds
 that this value is less than is required to store
 the payload result, then it is set to a value large enough to store the
 payload result and ENOSPC is returned. Note that for string controls
