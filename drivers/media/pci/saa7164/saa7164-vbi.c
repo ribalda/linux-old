@@ -494,30 +494,6 @@ static int saa7164_get_ctrl(struct saa7164_port *port,
 	return 0;
 }
 
-static int vidioc_g_ext_ctrls(struct file *file, void *priv,
-	struct v4l2_ext_controls *ctrls)
-{
-	struct saa7164_vbi_fh *fh = file->private_data;
-	struct saa7164_port *port = fh->port;
-	int i, err = 0;
-
-	if (ctrls->ctrl_class == V4L2_CTRL_CLASS_MPEG) {
-		for (i = 0; i < ctrls->count; i++) {
-			struct v4l2_ext_control *ctrl = ctrls->controls + i;
-
-			err = saa7164_get_ctrl(port, ctrl);
-			if (err) {
-				ctrls->error_idx = i;
-				break;
-			}
-		}
-		return err;
-
-	}
-
-	return -EINVAL;
-}
-
 static int saa7164_try_ctrl(struct v4l2_ext_control *ctrl, int ac3)
 {
 	int ret = -EINVAL;
@@ -809,6 +785,39 @@ static int vidioc_queryctrl(struct file *file, void *priv,
 
 	return -EINVAL;
 }
+
+static int vidioc_g_ext_ctrls(struct file *file, void *priv,
+	struct v4l2_ext_controls *ctrls)
+{
+	struct saa7164_vbi_fh *fh = file->private_data;
+	struct saa7164_port *port = fh->port;
+	int i, err = 0;
+
+	if (ctrls->ctrl_class != V4L2_CTRL_CLASS_MPEG &&
+		ctrls->which != V4L2_CTRL_WHICH_DEF_VAL)
+		return -EINVAL;
+
+	for (i = 0; i < ctrls->count; i++) {
+		struct v4l2_ext_control *ctrl = ctrls->controls + i;
+
+		if (ctrls->which == V4L2_CTRL_WHICH_DEF_VAL) {
+			struct v4l2_queryctrl q;
+
+			err = fill_queryctrl(&port->vbi_params, &q);
+			if (!err)
+				ctrl->value = q.default_value;
+		} else
+			err = saa7164_get_ctrl(port, ctrl);
+
+		if (err) {
+			ctrls->error_idx = i;
+			break;
+		}
+	}
+
+	return err;
+}
+
 
 static int saa7164_vbi_stop_port(struct saa7164_port *port)
 {
