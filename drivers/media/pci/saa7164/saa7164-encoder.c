@@ -538,7 +538,7 @@ static int vidioc_g_ext_ctrls(struct file *file, void *priv,
 	struct saa7164_port *port = fh->port;
 	int i, err = 0;
 
-	if (ctrls->ctrl_class == V4L2_CTRL_CLASS_MPEG) {
+	if (ctrls->which == V4L2_CTRL_CLASS_MPEG) {
 		for (i = 0; i < ctrls->count; i++) {
 			struct v4l2_ext_control *ctrl = ctrls->controls + i;
 
@@ -612,7 +612,7 @@ static int vidioc_try_ext_ctrls(struct file *file, void *priv,
 {
 	int i, err = 0;
 
-	if (ctrls->ctrl_class == V4L2_CTRL_CLASS_MPEG) {
+	if (ctrls->which == V4L2_CTRL_CLASS_MPEG) {
 		for (i = 0; i < ctrls->count; i++) {
 			struct v4l2_ext_control *ctrl = ctrls->controls + i;
 
@@ -687,7 +687,7 @@ static int vidioc_s_ext_ctrls(struct file *file, void *priv,
 	struct saa7164_port *port = fh->port;
 	int i, err = 0;
 
-	if (ctrls->ctrl_class == V4L2_CTRL_CLASS_MPEG) {
+	if (ctrls->which == V4L2_CTRL_CLASS_MPEG) {
 		for (i = 0; i < ctrls->count; i++) {
 			struct v4l2_ext_control *ctrl = ctrls->controls + i;
 
